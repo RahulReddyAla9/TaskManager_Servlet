@@ -15,4 +15,14 @@
     <servlet-name>Servlet</servlet-name>
     <url-pattern>/Default</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>HelloWorld</display-name>
+    <servlet-name>Servlet2</servlet-name>
+    <servlet-class>Servlets.Servlet2</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Servlet2</servlet-name>
+    <url-pattern>/Search</url-pattern>
+  </servlet-mapping>
 </web-app>

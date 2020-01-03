@@ -7,8 +7,8 @@ import java.util.Date;
 import java.util.List;
 
 public class DataBaseRepository implements TaskRepository {
-    //private Connection con;
-    public Statement statement;
+    private Connection con;
+    //public Statement statement;
     public DataBaseRepository(){
         ConnectionEstablishment();
     }
@@ -17,8 +17,8 @@ public class DataBaseRepository implements TaskRepository {
         try {
             Class.forName("com.mysql.jdbc.Driver");
 
-            Connection con  = DriverManager.getConnection("jdbc:mysql://localhost:3306/taskmanager", "user", "password");
-            statement=con.createStatement();
+            this.con  = DriverManager.getConnection("jdbc:mysql://localhost:3306/taskmanager", "user", "password");
+//            statement=con.createStatement();
         } catch (SQLException  | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -29,15 +29,22 @@ public class DataBaseRepository implements TaskRepository {
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy/MM/dd");
         String date=simpleDateFormat.format(task.getDueDate());
         try {
-            //Statement stmt=con.createStatement();
+            Statement stmt=con.createStatement();
             String q="insert into task values("+task.getId()+",\""+task.getName()+"\",\""
                     +task.getDescription()+"\",\""+date
                     +"\",\""+task.getStatus()+"\")";
             System.out.println(q);
-            statement.executeUpdate(q);
+            stmt.executeUpdate(q);
 //         con.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+        finally {
+            try {
+                con.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -45,7 +52,7 @@ public class DataBaseRepository implements TaskRepository {
     public List<Task> toDisplayTask() {
         List<Task> getList= new ArrayList<>();
         try {
-            //Statement statement= con.createStatement();
+            Statement statement= con.createStatement();
             String s="select * from task";
             ResultSet resultSet=statement.executeQuery(s);
             while (resultSet.next()){
@@ -65,7 +72,7 @@ public class DataBaseRepository implements TaskRepository {
 
         int totalTasksAfterDelete;
         try{
-           // Statement stmt=con.createStatement();
+           Statement statement=con.createStatement();
             String s="delete from task where id="+taskId;
             statement.executeUpdate(s);
 
@@ -81,10 +88,10 @@ public class DataBaseRepository implements TaskRepository {
     @Override
     public Task toSearchById(int taskId) {
 
-        Task task=new Task();
+        Task task=null;
         try{
 
-            //Statement stmt = con.createStatement();
+            Statement statement = con.createStatement();
             String s="select * from task where id="+taskId;
             ResultSet resultSet=statement.executeQuery(s);
 
@@ -104,7 +111,7 @@ public class DataBaseRepository implements TaskRepository {
     public List<Task> listByStatus(TaskStatus status) {
         List<Task> tasks=new ArrayList<>();
         try{
-           // Statement stmt = con.createStatement();
+            Statement statement = con.createStatement();
             String s="select * from task where status='"+status+"'";
             ResultSet resultSet=statement.executeQuery(s);
             while(resultSet.next()){
@@ -124,7 +131,7 @@ public class DataBaseRepository implements TaskRepository {
     @Override
     public void updateStatus(int taskId, TaskStatus status) {
         try{
-           // Statement stmt = con.createStatement();
+            Statement statement = con.createStatement();
             String s="update task set status='"+status+"' where id="+taskId;
             statement.executeUpdate(s);
         }catch(SQLException e){
@@ -136,7 +143,7 @@ public class DataBaseRepository implements TaskRepository {
     public int totalTasks() {
         int getTotalTasks=0;
         try{
-            //Statement stmt = con.createStatement();
+            Statement statement = con.createStatement();
             String s="select count(*) from task";
             ResultSet resultSet=statement.executeQuery(s);
             if(resultSet.next())
@@ -152,7 +159,7 @@ public class DataBaseRepository implements TaskRepository {
     public List<Task> getPendingTasks() {
         List<Task> tasks=new ArrayList<>();
         try{
-          //  Statement stmt = con.createStatement();
+            Statement statement = con.createStatement();
             String s="select * from task where status='IN_PROGRESS' or status='CREATED' order by date asc";
             ResultSet resultSet=statement.executeQuery(s);
 
@@ -174,7 +181,7 @@ public class DataBaseRepository implements TaskRepository {
         Date date=new Date();
         String currentDate = dateToString(date, "yyyy/MM/dd");
         try {
-          //  Statement stmt = con.createStatement();
+            Statement statement = con.createStatement();
             String s="select * from task where date='"+currentDate + "'";
             ResultSet resultSet = statement.executeQuery(s);
             while (resultSet.next()) {
