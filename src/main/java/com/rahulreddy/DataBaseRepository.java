@@ -158,6 +158,7 @@ public class DataBaseRepository implements TaskRepository {
     @Override
     public List<Task> getPendingTasks() {
         List<Task> tasks=new ArrayList<>();
+        //System.out.println("ujsdgkcas");
         try{
             Statement statement = con.createStatement();
             String s="select * from task where status='IN_PROGRESS' or status='CREATED' order by date asc";
